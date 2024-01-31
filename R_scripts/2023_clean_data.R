@@ -320,7 +320,7 @@ CONTRIB_PP_BY_DEST <- costs_operations %>%
   summarise(across(where(is.numeric), ~ sum(., na.rm=T)))%>%
   # add average across countries
   bind_rows(costs_operations%>%
-              group_by(DEST = "average across all destinations")%>%
+              group_by(DEST = "average")%>%
               summarise(across(where(is.numeric), ~ sum(., na.rm=T))))%>%
   mutate(FX_CONTRIB_PP = EUR / N_RETURNEES)%>%
   arrange(desc(FX_CONTRIB_PP))%>%
