@@ -27,6 +27,7 @@ fill: #fff;
   display: none;
   background-color: white;
   opacity: 0.95;
+  width: 150px;
   /* min-width: 80px;
   max-width: 300px;
   min-height: auto; */
@@ -89,4 +90,14 @@ a {
 
 a:hover{
 	color: #715678;
+}
+
+.mobile-hidden {
+  display: block; /* Show the text on desktop */
+}
+
+@media (max-width: 767px) {
+  .mobile-hidden {
+    display: none; /* Hide the text on mobile */
+  }
 }

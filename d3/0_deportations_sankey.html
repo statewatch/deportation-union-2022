@@ -30,7 +30,7 @@
 <svg id="chart"></svg>
 
 <div class="caption">
-  <p> <a href="../clean_data/N_RETURNEES_MSNAME_DEST_ROUTES_MIN_15_new.csv" target="_blank">Get the raw data behind this visualisation</a>  </p>
+  <p> <a href="../clean_data/N_RETURNEES_MSNAME_DEST_ROUTES_MIN_15_new.csv" target="_blank">Get the raw data behind this visualisation</a> | <a href="https://www.statewatch.org/deportation-union-rights-accountability-and-the-eu-s-push-to-increase-forced-removals/" target="_blank">Link to full Deportation Union spreadsheet</a> </p>
 </div>
 <div class="caption">
   <p>Number of deported persons in the time frame between 2006 and 2022 by deporting EU member states and destinations. This graphic only includes the 15 EU states and the 15 destinations with the largest number of deportations in the time period. Both EU states (on the left) as well as destinations are sorted by total number of deported people.</p>
@@ -46,9 +46,9 @@ var units = "Widgets";
 	// height = window.innerHeight - margin.top - margin.bottom - 150;
   // -100 height to leave space for the selector within iframe
 
-var    margin = {top: 10, right: 150, bottom: 10, left: 10},
+var    margin = {top: 10, right: 10, bottom: 10, left: 10},
   width = window.innerWidth - margin.left - margin.right,
-  height = window.innerHeight - margin.top - margin.bottom - 150;
+  height = window.innerHeight - margin.top - margin.bottom - 200;
   // -100 height to leave space for the selector within iframe
 
 var svg = d3.select("#chart").attr("width", width + margin.left + margin.right)
@@ -129,9 +129,12 @@ d3.csv("../clean_data/N_RETURNEES_MSNAME_DEST_ROUTES_MIN_15_new.csv", function(e
    		  return d.color = color(d.source.name.replace(/ .*/, "")); })
         .on("mouseover", function(d){
 
+          // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
         d3.select(".tooltip")
-           .style("left", d3.event.pageX + "px")
-           .style("top", d3.event.pageY + "px")
+        .style("left", tooltipX + "px") // Use the adjusted tooltipX position
+            .style("top", d3.event.pageY + "px")
            .style("display", "inline-block")
            .html("<div class = 'tooltip-title'>" +
            "Persons deported " + "<br>" + "from " +
@@ -144,9 +147,12 @@ d3.csv("../clean_data/N_RETURNEES_MSNAME_DEST_ROUTES_MIN_15_new.csv", function(e
 
         })
         .on("mousemove", function(){
+          // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
           d3.select(".tooltip")
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY + "px");
+          .style("left", tooltipX + "px") // Use the adjusted tooltipX position
+            .style("top", d3.event.pageY + "px");
         })
         .on("mouseout",function(){
           d3.select(".tooltip")

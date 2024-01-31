@@ -13,7 +13,7 @@
 <svg id="chart"></svg>
 
 <div class="caption">
-  <p> <a href="../clean_data/OPTYPE_YEAR_new.csv" target="_blank">Get the raw data behind this visualisation</a> </p>
+  <p> <a href="../clean_data/OPTYPE_YEAR_new.csv" target="_blank">Get the raw data behind this visualisation</a> | <a href="https://www.statewatch.org/deportation-union-rights-accountability-and-the-eu-s-push-to-increase-forced-removals/" target="_blank">Link to full Deportation Union spreadsheet</a> </p>
 </div>
 <div class="caption">
   <p>Note: When the same operation ID is used for multiple dates, they are counted as different operations. Only operations taking place the same day and sharing an ID are counted as the same operation.</p>
@@ -36,6 +36,8 @@ var EUformat = d3.formatDefaultLocale({
         "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     })
 
+    var isMobile = window.innerWidth < 768;
+
 var menu = d3.select("#KEY")
 
 d3.csv("../clean_data/OPTYPE_YEAR_new.csv").then(d => chart(d))
@@ -53,9 +55,9 @@ function chart(csv) {
 		.text(d => d)
 
 	var svg = d3.select("#chart"),
-		margin = {top: 20, left: 100, bottom: 0, right: 15},
+		margin = {top: 20, left: 60, bottom: 30, right: 15},
 		width = window.innerWidth - margin.left - margin.right,
-		height = window.innerHeight - margin.top - margin.bottom - 150;
+		height = window.innerHeight - margin.top - margin.bottom - 200;
     // -100 height to leave space for the selector within iframe
 
 svg.attr("width", width + margin.left) // margin.right should stay empty
@@ -72,7 +74,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 	// 	.paddingInner(0.2)
 
   var x = d3.scaleBand()
-		.range([margin.left, width - margin.right])
+		.range([margin.left, width + margin.left])
 		.padding(0.1)
 		.paddingOuter(0.2)
 		.paddingInner(0.2)
@@ -115,6 +117,11 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
     x.domain(data.map(d => d.YEAR));
     svg.selectAll(".x-axis").transition().duration(speed)
       .call(d3.axisBottom(x))
+      .selectAll("text") // Select all x-axis tick labels
+      .style("text-anchor",  isMobile ? "end" : "middle")
+      .attr("dx", isMobile ? "-.8em" : "0")
+      .attr("dy", isMobile ? "-.3em" : "0.7em")
+      .attr("transform", isMobile ? "rotate(-90)" : "rotate(0)");
 
 		var group = svg.selectAll("g.layer")
 			.data(d3.stack().keys(keys)(data), d => d.key)
@@ -149,13 +156,17 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
             var yPos = parseFloat(d3.select(this).attr("y"));
             var height = parseFloat(d3.select(this).attr("height"))
 
+            // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
+
             d3.select(this)
             .attr("stroke","#333333")
             .attr("stroke-width",0.8)
             .attr("opacity", 1);
 
             d3.select(".tooltip")
-            .style("left", d3.event.pageX + "px")
+            .style("left", tooltipX + "px") // Use the adjusted tooltipX position
             .style("top", d3.event.pageY + "px")
             .style("display", "inline-block")
             .html(
@@ -171,9 +182,13 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 
          })
          .on("mousemove", function(){
+          // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
+
            d3.select(".tooltip")
-           .style("left", d3.event.pageX + "px")
-           .style("top", d3.event.pageY + "px");
+           .style("left", tooltipX + "px") // Use the adjusted tooltipX position
+            .style("top", d3.event.pageY + "px");
          })
          .on("mouseout",function(){
            d3.select(".tooltip")
@@ -191,6 +206,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 
 		text.enter().append("text")
 			.attr("class", "text")
+      .attr("class", "mobile-hidden")
 			.attr("text-anchor", "middle")
 			.merge(text)
 		.transition().duration(speed)

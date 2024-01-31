@@ -15,10 +15,10 @@
 <svg id="chart"></svg>
 
 <div class="caption">
-  <p> <a href="../clean_data/FX_CONTRIB_YEARS_MSNAME_new.csv" target="_blank">Get the raw data behind this visualisation</a>  </p>
+  <p> <a href="../clean_data/FX_CONTRIB_YEARS_MSNAME_new.csv" target="_blank">Get the raw data behind this visualisation</a> | <a href="https://www.statewatch.org/deportation-union-rights-accountability-and-the-eu-s-push-to-increase-forced-removals/" target="_blank">Link to full Deportation Union spreadsheet</a> </p>
 </div>
 <div class="caption">
-  <p>Frontex contributions for return operations by year and EU member state. Bars are arranged by the total amount of money recieved across years (bottom bar is Germany, Germany has recieved the largest amount of contributions in the time period, second bar is Spain, Spain has recieved the second largest amount of contributions in the time period, a.s.o.)</p>
+  <p>Frontex contributions for return operations by year and EU member state. Bars are arranged by the total amount of money recieved across years (bottom bar is Germany, Germany has recieved the largest amount of contributions in the time period, second bar is Austria, Austria has recieved the second largest amount of contributions in the time period, a.s.o.)</p>
 </div>
 
 
@@ -39,6 +39,8 @@ var EUformat = d3.formatDefaultLocale({
         "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     })
 
+    var isMobile = window.innerWidth < 768;
+
 var menu = d3.select("#MSNAME")
 
 d3.csv("../clean_data/FX_CONTRIB_YEARS_MSNAME_new.csv").then(d => chart(d))
@@ -56,9 +58,9 @@ function chart(csv) {
 		.text(d => d)
 
 	var svg = d3.select("#chart"),
-		margin = {top: 20, left: 100, bottom: 0, right: 15},
+		margin = {top: 20, left: 50, bottom: 30, right: 15},
 		width = window.innerWidth - margin.left - margin.right,
-		height = window.innerHeight - margin.top - margin.bottom - 200;
+		height = window.innerHeight - margin.top - margin.bottom - 210;
     // -100 height to leave space for the selector within iframe
 
 svg.attr("width", width + margin.left) // margin.right should stay empty
@@ -75,7 +77,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 	// 	.paddingInner(0.2)
 
   var x = d3.scaleBand()
-		.range([margin.left, width - margin.right])
+		.range([margin.left, width + margin.left])
 		.padding(0.1)
 		.paddingOuter(0.2)
 		.paddingInner(0.2)
@@ -113,11 +115,16 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 
     y.domain([d3.max(data, d => d.total), 0]).nice();
 		svg.selectAll(".y-axis").transition().duration(speed)
-			.call(d3.axisLeft(y).tickFormat(EUformat.format("$,.0f")))
+    .call(d3.axisLeft(y).tickFormat(d => EUformat.format("$,.0s")(d)).ticks(7))
 
     x.domain([2008, 2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022]);
     svg.selectAll(".x-axis").transition().duration(speed)
       .call(d3.axisBottom(x))
+      .selectAll("text") // Select all x-axis tick labels
+      .style("text-anchor",  isMobile ? "end" : "middle")
+      .attr("dx", isMobile ? "-.8em" : "0")
+      .attr("dy", isMobile ? "-.3em" : "0.7em")
+      .attr("transform", isMobile ? "rotate(-90)" : "rotate(0)");
 
 		var group = svg.selectAll("g.layer")
 			.data(d3.stack().keys(keys)(data), d => d.key)
@@ -154,13 +161,17 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
             var yPos = parseFloat(d3.select(this).attr("y"));
             var height = parseFloat(d3.select(this).attr("height"))
 
+            // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
+
             d3.select(this)
             .attr("stroke","#333333")
             .attr("stroke-width",0.8)
             .attr("opacity", 1);
 
             d3.select(".tooltip")
-            .style("left", d3.event.pageX + "px")
+            .style("left", tooltipX + "px") // Use the adjusted tooltipX position
             .style("top", d3.event.pageY + "px")
             .style("display", "inline-block")
             .html("<div class = 'tooltip-title'>" +
@@ -176,9 +187,13 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 
          })
          .on("mousemove", function(){
+
+          // Adjust tooltip position based on mouse x-position
+          var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
+
            d3.select(".tooltip")
-           .style("left", d3.event.pageX + "px")
-           .style("top", d3.event.pageY + "px");
+           .style("left", tooltipX + "px") // Use the adjusted tooltipX position
+            .style("top", d3.event.pageY + "px");
          })
          .on("mouseout",function(){
            d3.select(".tooltip")
