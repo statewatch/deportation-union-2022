@@ -49,7 +49,7 @@ function chart(csv) {
   console.log(data)
 
 	var svg = d3.select("#chart"),
-		margin = {top: 20, left: 65, bottom: 10, right: 15},
+		margin = {top: 20, left: 65, bottom: 20, right: 15},
 		width = window.innerWidth - margin.left - margin.right,
 		height = window.innerHeight - margin.top - margin.bottom - 250;
     // -100 height to leave space for the selector within iframe
@@ -133,6 +133,8 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
       .style("text-anchor",  isMobile ? "end" : "middle")
       .attr("dx", isMobile ? "-.8em" : "0")
       .attr("dy", isMobile ? "-.3em" : "0.7em")
+      .attr("dy", isMobile ? "-.3em" : "0.7em")
+      .style("font-size", isMobile ? "0.7rem" : "0.85rem")
       .attr("transform", isMobile ? "rotate(-90)" : "rotate(0)");
 
       svg.selectAll("div")
@@ -153,7 +155,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
               .attr("stroke","#333333")
               .attr("stroke-width",0.8)
               .attr("opacity", 1);
-
+              
               // Adjust tooltip position based on mouse x-position
           var tooltipX = d3.event.pageX > window.innerWidth / 2 ? d3.event.pageX - 150 : d3.event.pageX + 10;
 
