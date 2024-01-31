@@ -165,13 +165,11 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
             .style("top", d3.event.pageY + "px")
               .style("display", "inline-block")
               .html("<div class = 'tooltip-title'>" +
-                "Frontex contributions"+ "<br>"+
-                "per person deported"+ "<br>"+
-              "to " + "<strong>" + d.DEST +"</strong>" + "<br>" +
+                "<strong>" + EUformat.format("$,.0f")(d.FX_CONTRIB_PP)+"</strong> per person" + "<br>" +
               "</div>"+
               "<div class = 'tooltip-content'>" +
-              "<strong>" + EUformat.format("$,.0f")(d.FX_CONTRIB_PP)+"</strong> per person" +"<br>"+
-              "average across " + d.N_OPS + " operation(s)"+
+              
+              "average across " + d.N_OPS + " operation(s) and" + d.N_RETURNEES + "people"+
               "</div>");
 
            })
