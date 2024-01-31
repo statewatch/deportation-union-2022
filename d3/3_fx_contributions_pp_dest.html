@@ -125,7 +125,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
       })
 
       svg.selectAll(".y-axis")
-        .call(d3.axisLeft(y).tickFormat(EUformat.format("$,.0f")))
+      .call(d3.axisLeft(y).tickFormat(d => EUformat.format("$,.0s")(d)))
 
       svg.selectAll(".x-axis")
         .call(d3.axisBottom(x))
