@@ -49,7 +49,7 @@ function chart(csv) {
   console.log(data)
 
 	var svg = d3.select("#chart"),
-		margin = {top: 20, left: 65, bottom: 20, right: 15},
+		margin = {top: 20, left: 50, bottom: 60, right: 15},
 		width = window.innerWidth - margin.left - margin.right,
 		height = window.innerHeight - margin.top - margin.bottom - 250;
     // -100 height to leave space for the selector within iframe
@@ -72,7 +72,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 		.padding(0.1)
 		.paddingOuter(0.2)
 		.paddingInner(0.2)
-    .domain(data.map(function(d) { return d.iso; }));
+    .domain(data.map(function(d) { return d.DEST; }));
 
   // var x = d3.scaleLinear()
 	// 	.range([margin.left, width - margin.right])
@@ -117,7 +117,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
         '#7a6989',
         '#7a6989',
 ])
-  		.domain(data.map(function(d) { return d.iso; }));
+  		.domain(data.map(function(d) { return d.DEST; }));
 
       data.forEach(function(d) {
         d.FX_CONTRIB_PP = +d.FX_CONTRIB_PP
@@ -130,12 +130,11 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
       svg.selectAll(".x-axis")
         .call(d3.axisBottom(x))
         .selectAll("text") // Select all x-axis tick labels
-      .style("text-anchor",  isMobile ? "end" : "middle")
-      .attr("dx", isMobile ? "-.8em" : "0")
-      .attr("dy", isMobile ? "-.3em" : "0.7em")
-      .attr("dy", isMobile ? "-.3em" : "0.7em")
-      .style("font-size", isMobile ? "0.7rem" : "0.85rem")
-      .attr("transform", isMobile ? "rotate(-90)" : "rotate(0)");
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em" )
+      .attr("dy", "-.3em" )
+      .attr("dy", "-.3em" )
+      .attr("transform", "rotate(-90)");
 
       svg.selectAll("div")
         .data(data)
@@ -145,8 +144,8 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
         .attr("width", x.bandwidth())
         .attr("stroke","white")
         .attr("stroke-width",0)
-        .attr("fill",d => z(d.iso))
-        .attr("x", d => x(d.iso))
+        .attr("fill",d => z(d.DEST))
+        .attr("x", d => x(d.DEST))
         .attr("y", d => y(d.FX_CONTRIB_PP))
         .attr("height", d => y(0) - y(d.FX_CONTRIB_PP))
         .on("mouseover", function(d){
