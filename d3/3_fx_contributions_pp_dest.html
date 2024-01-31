@@ -68,7 +68,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 	// 	.paddingInner(0.2)
 
   var x = d3.scaleBand()
-		.range([margin.left, width + margin.left])
+		.range([margin.left, width + margin.left - 3]) //3px to avoid clipping of label
 		.padding(0.1)
 		.paddingOuter(0.2)
 		.paddingInner(0.2)
