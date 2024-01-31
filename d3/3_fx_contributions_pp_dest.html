@@ -51,7 +51,7 @@ function chart(csv) {
 	var svg = d3.select("#chart"),
 		margin = {top: 20, left: 50, bottom: 60, right: 15},
 		width = window.innerWidth - margin.left - margin.right,
-		height = window.innerHeight - margin.top - margin.bottom - 210;
+		height = window.innerHeight - margin.top - margin.bottom - 170;
     // -100 height to leave space for the selector within iframe
 
 svg.attr("width", width + margin.left) // margin.right should stay empty
@@ -134,6 +134,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
       .attr("dx", "-.8em" )
       .attr("dy", "-.3em" )
       .attr("dy", "-.3em" )
+      .style("font-size", isMobile ? "0.7rem" : "0.85rem")
       .attr("transform", "rotate(-90)");
 
       svg.selectAll("div")
