@@ -203,9 +203,8 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 		text.exit().remove()
 
 		text.enter().append("text")
-			.attr("class", "text")
-      .attr("class", "mobile-hidden")
-			.attr("text-anchor", "middle")
+    .attr("class", "text mobile-hidden") // Combine both classes
+    .attr("text-anchor", "middle")
 			.merge(text)
 		.transition().duration(speed)
 			.attr("x", d => x(d.YEAR) + x.bandwidth() / 2)

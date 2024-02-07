@@ -205,8 +205,7 @@ svg.attr("width", width + margin.left) // margin.right should stay empty
 		text.exit().remove()
 
 		text.enter().append("text")
-			.attr("class", "text")
-      .attr("class", "mobile-hidden")
+			.attr("class", "mobile-hidden text")
 			.attr("text-anchor", "middle")
 			.merge(text)
 		.transition().duration(speed)
