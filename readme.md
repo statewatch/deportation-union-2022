@@ -2,9 +2,7 @@
 
 - run R scripts (folder `R_scripts`) in the numbered order
 - adjust html files in `d3` if necessary:
-	- add most recent year to y-scales
 	- add color categories for additional data, e.g. new types of operations
-	- adjust the color code for average across countries (contributions pp) to match the ranking
 
 # Repository contents
 
@@ -40,7 +38,7 @@ Note: Only operations with exactly one member state and one destination were con
 
 - number of people deported by frontex is much lower in supplied data than in a report obtained by statewatch (https://www.statewatch.org/news/2023/june/frontex-aided-the-deportation-of-almost-25-000-people-in-2022/)
 
-- data supplied by frontex on costs has figures with 4 digits after the decimal point for amounts in €. not sure how to interpret
+- data supplied by frontex on costs has figures with 4 digits after the decimal point for amounts in €
 
 - dates differ for some operations between data supplied for number of deported persons and operation types.
 
