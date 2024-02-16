@@ -117,9 +117,6 @@ operations <- temp %>%
   full_join(returnees)%>%
   mutate(OPTYPE = if_else(is.na(OPTYPE), "unknown", OPTYPE))
 
-# write_csv(operations %>% filter(is.na(N_RETURNEES)),
-#           "../clean_data/operations_missing_TCN_data.csv")  
-
 OPTYPE_YEAR <- operations %>%
   group_by(ROID, DATE, OPTYPE)%>%
   summarize(N_RETURNEES = sum(N_RETURNEES, na.rm=T))%>%
@@ -130,13 +127,6 @@ OPTYPE_YEAR <- operations %>%
   group_by(YEAR, OPTYPE)%>%
   summarize(`Number of deported people` = sum(N_RETURNEES, na.rm = T), 
             `Number of operations` = n())%>%
-  # ## use returnee numbers from old data, operation figures from new data
-  # left_join(optype_returnees_old %>%
-  #             ## from new data we see that all operations were JROs
-  #             mutate(OPTYPE = "JRO")%>%
-  #             select(YEAR, OPTYPE, N_RETURNEES = `Number of deported people`))%>%
-  # mutate(`Number of deported people` = if_else(YEAR %in% missing_years, N_RETURNEES, `Number of deported people`))%>%
-  # select(-N_RETURNEES)%>%
   mutate(OPTYPE = if_else(is.na(OPTYPE), "unknown", OPTYPE))%>%
   gather(-YEAR, -OPTYPE, key = KEY, value = value)%>%
   mutate(OPTYPE = factor(OPTYPE, levels = c('JRO', 'CRO','NRO', 'VDO', 'VRD', 'FRONTEX-RO', 'Humanitarian VR', 'unknown')))%>%
@@ -211,8 +201,6 @@ temp2 <- read_excel("../raw_data/230307/Returns_CF_2013-2018.xlsx", sheet = 10)%
   mutate(YEAR = 2016, DATE = ymd(DATE))%>%
   fill(ro_nr, .direction="down")%>%
   mutate(ROID = glue('RO-{YEAR}-{str_pad(ro_nr, 3, "left", "0")}'))%>%
-  ## multiple operations per day
-  # left_join(operations%>%filter(year(DATE) == 2016)%>%select(ROID, DATE))%>%
   mutate(MS = str_to_title(MS),
          MS = str_replace_all(MS, "Fx Missions|Fx Mission", "Frontex"),
          MS = str_remove_all(MS, "Observers|Observer|Obs|\\(|\\)|_observers|_cancelled|_ombudsman|_stopover|Cancelled|_no Costs|_jcc With At|Cancellation|_cancellation|_observer|_monitors|_monitor|_rf"),
@@ -276,10 +264,6 @@ FX_CONTRIB_YEARS_MSNAME_TOTAL <- FX_CONTRIB %>%
   rename(MSNAME = MS, FX_CONTRIB = EUR)%>%
   group_by(MSNAME, YEAR) %>%
   summarize(FX_CONTRIB = sum(FX_CONTRIB, na.rm = T))%>%
-  # spread(key = YEAR, value = FX_CONTRIB)%>%
-  # mutate(across(c(`2009`:`2021`), ~replace_na(.,0)))%>%
-  # gather(-MSNAME, key = YEAR, value = FX_CONTRIB)%>%
-  # filter(FX_CONTRIB > 0)%>%
   spread(key = MSNAME, value = FX_CONTRIB)%>%
   dplyr::mutate(across(c(as.name(countries[1]):as.name(countries[length(countries)])), ~replace_na(.,0)))%>%
   select(append("YEAR", temp_order$MSNAME))%>%
@@ -301,7 +285,6 @@ write_csv(FX_CONTRIB_YEARS_MSNAME, "../clean_data/FX_CONTRIB_YEARS_MSNAME_new.cs
 # FX CONTIB pp
 
 costs_operations <- returnees %>%
-  # filter(year(DATE) >= 2013)%>%
   group_by(ROID, DEST, DATE)%>%
   summarize(N_RETURNEES = sum(N_RETURNEES, na.rm=T))%>%
   group_by(ROID, DATE)%>%
@@ -347,102 +330,3 @@ CONTRIB_PP_BY_DEST <- costs_operations %>%
   head(26)
 
 write_csv(CONTRIB_PP_BY_DEST, "../clean_data/CONTRIB_PP_BY_DEST_new.csv")
-
-# #######################################################################
-# # CLEANING FIGURES ON STAFF
-# # - not finished
-# # - lots of different categories, seem to have changed over the years
-# #######################################################################
-# 
-# temp <- bind_rows(read_excel("../raw_data/230307/Returns_CF_2013-2018.xlsx", sheet = 1),
-#                   read_excel("../raw_data/230328/Returns_CF_2006-2012.xlsx", sheet = 1))
-# 
-# fxstaff_perop_2006_2018 <- temp %>%
-#   select(-`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`, -`...7`, -`...8`)
-# 
-# temp <- temp %>%
-#   select(-`FRONTEX STAFF ON BOARD`, -`...7`, -`...8`)%>%
-#   ## fix one case to avoid parsing issues
-#   mutate(`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)` = 
-#            case_when(
-#              `MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)` == "1 FRA + 2 NLD + 6 obser.(3 USA + 2 JPN + 1 RUS)" ~ "1 FRA + 2 NLD + 6 obser.(3 USA, 2 JPN, 1 RUS)",
-#              TRUE ~ `MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`
-#            ))
-# 
-# monitors_perop_2006_2018 <- temp %>%
-#   ## hack to make regex work
-#   mutate(`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)` = 
-#            if_else(!is.na(`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`),
-#                    glue("{`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`}()"),
-#                    NA_character_))%>%
-#   # separate counts for monitors from different countries
-#   separate(`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`,
-#            ## max 4 parts detected
-#            c("MON_OBS_1", "MON_OBS_2", "MON_OBS_3", "MON_OBS_4"), 
-#            ## regex for + and commas before brackets and commas after brackets
-#            ## TO DO: add for commas in sentences with no bracket
-#            sep = "\\+|,.*(?=\\()|(?=\\)).*,")%>%
-#   gather(-c(`DATE OF DEPARTURE`, `TYPE OF OPERATION`, `DESTINATION (S)`, `ROID`), key = key, value = monitors)%>%
-#   ## move observers to another column
-#   mutate(observers = if_else(grepl("obs", monitors), monitors, NA_character_),
-#          monitors = if_else(grepl("obs", monitors), NA_character_ , monitors))%>%
-#   select(-key)%>%
-#   select(-observers)%>%
-#   filter(!is.na(monitors))%>%
-#   mutate(monitors = str_remove_all(monitors, " |\\(\\)"))%>%
-#   ## only extract first number to avoid false "list" type
-#   mutate(n_monitors = (str_extract(monitors, "\\d")),
-#          monitors_iso = str_remove_all(monitors, "\\d"))%>%
-#   mutate(n_monitors = as.numeric(n_monitors))%>%
-#   filter(monitors != "")%>%
-#   select(-monitors)
-# 
-# obs_perop_2006_2018 <- temp %>%
-#   # separate counts for monitors from different countries
-#   separate(`MONITORS ON BOARD\r\n(from MS or/and \r\nfrom FX pool)`,
-#            ## max 4 parts detected
-#            c("MON_OBS_1", "MON_OBS_2", "MON_OBS_3", "MON_OBS_4"), 
-#            sep = "\\+")%>%
-#   gather(-c(`DATE OF DEPARTURE`, `TYPE OF OPERATION`, `DESTINATION (S)`, `ROID`), key = key, value = monitors)%>%
-#   ## move observers to another column
-#   mutate(observers = if_else(grepl("obs", monitors), monitors, NA_character_),
-#          monitors = if_else(grepl("obs", monitors), NA_character_ , monitors))%>%
-#   select(-key)%>%
-#   select(-monitors)%>%
-#   filter(!is.na(observers))%>%
-#   ## manually filter out non-observer
-#   mutate(observers = str_replace_all(
-#     observers, 
-#     c("1 MLT, 2 SVN obser." = "2 SVN",
-#       " 6 obser\\.\\(DEU, POL, FRA, NOR, 2 CHE\\)" = "1 DEU, 1 POL, 1 FRA, 1 NOR, 2 CHE")
-#   )) %>%
-#   ## clean observer data manually
-#   mutate(observers = str_remove_all(
-#     observers,
-#     "observ\\.|obser\\.|()"
-#   ))%>%
-#   ## clean observer data manually
-#   mutate(observers = str_remove_all(
-#     observers,
-#     "\\(\\)"
-#   ))%>%
-#   ## clean observer data manually
-#   mutate(observers = str_remove_all(
-#     observers,
-#     ".*\\(|\\)"
-#   ))%>%
-#   # separate counts for monitors from different countries
-#   separate(observers,
-#            ## max 4 parts detected
-#            c("OBS_1", "OBS_2", "OBS_3", "OBS_4", "OBS_5"), 
-#            sep = ",")%>%
-#   gather(-c(`DATE OF DEPARTURE`, `TYPE OF OPERATION`, `DESTINATION (S)`, `ROID`), 
-#          key = key, value = observers)%>%
-#   filter(!is.na(observers))%>%
-#   select(-key)%>%
-#   mutate(observers = str_remove_all(observers, " |\\(\\)"))%>%
-#   mutate(n_obs = (str_extract(observers, "\\d")),
-#          observers_iso = str_remove_all(observers, "\\d"))%>%
-#   select(-observers)
-
-
